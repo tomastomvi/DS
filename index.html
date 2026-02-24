@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CRUD Muitos-para-Muitos</title>
+</head>
+<body ><center>
+    <h2>👨‍🎓 Alunos</h2>
+    <input id="nomeAluno" placeholder="Nome">
+    <button onclick="addAluno()">+</button>
+    <ul id="alunos"></ul>
+
+    <h2>📚 Cursos</h2>
+    <input id="nomeCurso" placeholder="Curso">
+    <button onclick="addCurso()">+</button>
+    <ul id="cursos"></ul>
+
+    <h2>📝 Matrículas</h2>
+    <select id="alunoSelect"></select>
+    <select id="cursoSelect"></select>
+    <button onclick="matricular()">Matricular</button>
+    <ul id="matriculas"></ul>
+
+    <script>
+        // Banco de dados
+        let alunos = [{id:1, nome:'João'}];
+        let cursos = [{id:1, nome:'JS'}];
+        let matriculas = [{id:1, alunoId:1, cursoId:1}];
+        let nextId = 2;
+
+        function atualizarTela() {
+            // Alunos
+            document.getElementById('alunos').innerHTML = alunos.map(a => 
+                `<li>${a.nome} <button onclick="deletarAluno(${a.id})">X</button></li>`
+            ).join('');
+
+            // Cursos
+            document.getElementById('cursos').innerHTML = cursos.map(c => 
+                `<li>${c.nome} <button onclick="deletarCurso(${c.id})">X</button></li>`
+            ).join('');
+
+            // Selects
+            document.getElementById('alunoSelect').innerHTML = 
+                alunos.map(a => `<option value="${a.id}">${a.nome}</option>`);
+            document.getElementById('cursoSelect').innerHTML = 
+                cursos.map(c => `<option value="${c.id}">${c.nome}</option>`);
+
+            // Matrículas
+            document.getElementById('matriculas').innerHTML = matriculas.map(m => {
+                let aluno = alunos.find(a => a.id == m.alunoId);
+                let curso = cursos.find(c => c.id == m.cursoId);
+                return `<li>${aluno?.nome} - ${curso?.nome} <button onclick="deletarMatricula(${m.id})">X</button></li>`;
+            }).join('');
+        }
+
+        function addAluno() {
+            let nome = document.getElementById('nomeAluno').value;
+            if(nome) {
+                alunos.push({id: nextId++, nome});
+                atualizarTela();
+            }
+        }
+
+        function addCurso() {
+            let nome = document.getElementById('nomeCurso').value;
+            if(nome) {
+                cursos.push({id: nextId++, nome});
+                atualizarTela();
+            }
+        }
+
+        function matricular() {
+            let alunoId = parseInt(document.getElementById('alunoSelect').value);
+            let cursoId = parseInt(document.getElementById('cursoSelect').value);
+            
+            let existe = matriculas.some(m => m.alunoId == alunoId && m.cursoId == cursoId);
+            if(!existe) {
+                matriculas.push({id: nextId++, alunoId, cursoId});
+                atualizarTela();
+            }
+        }
+
+        function deletarAluno(id) {
+            matriculas = matriculas.filter(m => m.alunoId != id);
+            alunos = alunos.filter(a => a.id != id);
+            atualizarTela();
+        }
+
+        function deletarCurso(id) {
+            matriculas = matriculas.filter(m => m.cursoId != id);
+            cursos = cursos.filter(c => c.id != id);
+            atualizarTela();
+        }
+
+        function deletarMatricula(id) {
+            matriculas = matriculas.filter(m => m.id != id);
+            atualizarTela();
+        }
+
+        atualizarTela();
+    </script>
+</body></center>
+</html>
